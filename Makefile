@@ -9,3 +9,8 @@ run: compile $(EXEC)
 
 compile: $(SOURCE)
 	gcc $(SOURCE) $(INCLUDE) $(LINKER_FLAGS) -o $(EXEC)
+
+init:
+	@$(shell mkdir bin)
+	@$(shell cp lib\SDL\bin\SDL2.dll bin\)
+	@echo Finished Initialization

@@ -23,4 +23,4 @@ software-renderer
 |- Makefile
 ```
 
-Then, just run the make file and the executable should be created in a new `bin` folder in the main `software-renderer` folder.
+Then, just run the make file with `make init`, which creates a new `bin` folder and copies the SDL.dll into it. Running `make` after should build and run the project.
