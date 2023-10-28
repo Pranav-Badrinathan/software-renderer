@@ -1,6 +1,10 @@
+#include "defs.h"
+#include "draw.h"
+#include <SDL2/SDL_surface.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_video.h>
 
 void init_sdl(void) {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -8,15 +12,34 @@ void init_sdl(void) {
 		exit(EXIT_FAILURE);
 	}
 
+	SDL_Window *window;
+	SDL_Surface *surface;
+
 	// Setting x and y pos to SDL_WINDOW_POS_UNDEFINED leaves window positioning
 	// upto the OS
-	SDL_Window *window = SDL_CreateWindow("Renderer", SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, 600, 480, 0);
+	window = SDL_CreateWindow(
+		"Renderer", 
+		SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED, 
+		SCREEN_WIDTH, SCREEN_HEIGHT, 
+		SDL_WINDOW_RESIZABLE
+	);
 
 	if (window == NULL) {
 		printf("Unable to open window.");
 		exit(EXIT_FAILURE);
 	}
+
+	surface = SDL_GetWindowSurface(window);
+
+	if (surface == NULL) {
+		printf("Unable to get the window surface!");
+		exit(EXIT_FAILURE);
+	}
+	
+	draw_line(surface);
+	SDL_UpdateWindowSurface(window);
+	/* SDL_DestroyWindow(window); */
 }
 
 void do_input(void) {
