@@ -1,14 +1,16 @@
-SOURCE = ./src/main.c
-INCLUDE = -Ilib/SDL/include
+SOURCE = ./src/main.c ./src/draw.c
+COMPILER_FLAGS = -Ilib/SDL/include -Wall -mwindows
 EXEC = ./bin/renderer.exe
 
 LINKER_FLAGS = -Llib/SDL/lib -lmingw32 -lSDL2main -lSDL2
+
+CC=gcc
 
 run: compile $(EXEC)
 	$(EXEC)
 
 compile: $(SOURCE)
-	gcc $(SOURCE) $(INCLUDE) $(LINKER_FLAGS) -o $(EXEC)
+	$(CC) $(SOURCE) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(EXEC)
 
 init:
 	@$(shell mkdir bin)
