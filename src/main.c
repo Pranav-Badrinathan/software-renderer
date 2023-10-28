@@ -37,7 +37,10 @@ void init_sdl(void) {
 		exit(EXIT_FAILURE);
 	}
 	
-	draw_line(surface);
+	struct Point p1 = {10, 10};
+	struct Point p2 = {SCREEN_WIDTH -10, SCREEN_HEIGHT-10};
+
+	draw_line(surface, p1, p2);
 	SDL_UpdateWindowSurface(window);
 	/* SDL_DestroyWindow(window); */
 }

@@ -1,13 +1,16 @@
-#include "draw.h"
 #include "defs.h"
+#include <stdbool.h>
 #include <SDL2/SDL_surface.h>
+#include <stdlib.h>
 
-void draw_line(SDL_Surface *surface) {
-	put_pixel(surface, 
-		   SCREEN_WIDTH / 2, 
-		   SCREEN_HEIGHT / 2, 
-		   SDL_MapRGB(surface->format, 0xff, 0xff, 0xff));
-}
+struct Point {
+	int x;
+	int y;
+};
+
+struct Triangle {
+	struct Point verts[3];
+};
 
 void put_pixel(SDL_Surface *surface, int x, int y, Uint32 pixel) {
 	int bpp = surface->format->BytesPerPixel;
@@ -72,5 +75,37 @@ Uint32 get_pixel(SDL_Surface *surface, int x, int y) {
 
 		default:
 			return 0;
+	}
+}
+
+void draw_line_x(SDL_Surface *surface, struct Point p1, struct Point p2, bool rev) {
+	int dx = p2.x - p1.x;
+	int dy = p2.y - p1.y;
+
+	int descision = 2 * dx - dy;
+	
+	struct Point p = p1;
+
+	for (; p.x < p2.x; p.x++) {
+		put_pixel(surface, 
+			rev ? p.y : p.x, 
+			rev ? p.x : p.y, 
+			SDL_MapRGB(surface->format, 0xff, 0xff, 0xff));
+
+		if (descision < 0) {
+			descision += 2 * dy;
+		} else {
+			descision += (2 * dy) - (2 * dx);
+			p.y += 1;
+		}
+	}
+}
+
+void draw_line(SDL_Surface *surface, struct Point p1, struct Point p2) {
+	// Tell the draw helper function to flip the x and y if slope is >1.
+	if (abs(p2.x - p1.x) > abs(p2.y - p1.y)) {
+		draw_line_x(surface, p1, p2, false);
+	} else {
+		draw_line_x(surface, p2, p2, true);
 	}
 }
