@@ -78,34 +78,57 @@ Uint32 get_pixel(SDL_Surface *surface, int x, int y) {
 	}
 }
 
-void draw_line_x(SDL_Surface *surface, struct Point p1, struct Point p2, bool rev) {
-	int dx = p2.x - p1.x;
-	int dy = p2.y - p1.y;
+void draw_line(SDL_Surface *surface, struct Point p1, struct Point p2) {
+	const int dx = p2.x - p1.x;
+	const int dy = p2.y - p1.y;
 
-	int descision = 2 * dx - dy;
+	const int adx = abs(dx);
+	const int ady = abs(dy);
+
 	
-	struct Point p = p1;
+	if (adx >= ady) { // Case when the slope <= 1
+		int descision = 2 * ady - adx;
 
-	for (; p.x < p2.x; p.x++) {
-		put_pixel(surface, 
-			rev ? p.y : p.x, 
-			rev ? p.x : p.y, 
-			SDL_MapRGB(surface->format, 0xff, 0xff, 0xff));
+		for (int i = 0; i < adx; i++) {
+			put_pixel(surface,
+			 p1.x,
+			 p1.y,
+			 SDL_MapRGB(surface->format, 0xff, 0xff, 0xff));
 
-		if (descision < 0) {
-			descision += 2 * dy;
-		} else {
-			descision += (2 * dy) - (2 * dx);
-			p.y += 1;
+			// Plus if the slope is positive, minus if negative.
+			p1.x = dx < 0 ? p1.x - 1 : p1.x + 1;
+
+			if (descision <= 0) {
+				descision += 2 * ady;
+			} else {
+				descision += (2 * ady) - (2 * adx);
+				// Plus if the slope is positive, minus if negative.
+				p1.y = dy < 0 ? p1.y - 1 : p1.y + 1;
+			}
+		}
+	} else { // When slope > 1
+		int descision = 2 * adx - ady;
+
+		for (int i = 0; i < ady; i++) {
+			put_pixel(surface,
+			 p1.x,
+			 p1.y,
+			 SDL_MapRGB(surface->format, 0xff, 0xff, 0xff));
+
+			p1.y = dy < 0 ? p1.y - 1 : p1.y + 1;
+
+			if (descision <= 0) {
+				descision += 2 * adx;
+			} else {
+				descision += (2 * adx) - (2 * ady);
+				p1.x = dx < 0 ? p1.x - 1 : p1.x + 1;
+			}
 		}
 	}
 }
 
-void draw_line(SDL_Surface *surface, struct Point p1, struct Point p2) {
-	// Tell the draw helper function to flip the x and y if slope is >1.
-	if (abs(p2.x - p1.x) > abs(p2.y - p1.y)) {
-		draw_line_x(surface, p1, p2, false);
-	} else {
-		draw_line_x(surface, p2, p2, true);
-	}
+void draw_triangle(SDL_Surface *surface, struct Triangle tri) {
+	draw_line(surface, tri.verts[0], tri.verts[1]);
+	draw_line(surface, tri.verts[1], tri.verts[2]);
+	draw_line(surface, tri.verts[2], tri.verts[0]);
 }

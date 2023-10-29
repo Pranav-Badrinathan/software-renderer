@@ -37,10 +37,23 @@ void init_sdl(void) {
 		exit(EXIT_FAILURE);
 	}
 	
-	struct Point p1 = {10, 10};
-	struct Point p2 = {SCREEN_WIDTH -10, SCREEN_HEIGHT-10};
+	struct Point p1 = {SCREEN_WIDTH/2, (SCREEN_HEIGHT/2) - 25};
+	struct Point p2 = {(SCREEN_WIDTH/2) - 90, (SCREEN_HEIGHT/2) + 99};
+	struct Point p3 = {(SCREEN_WIDTH/2) - 0, (SCREEN_HEIGHT/2) + 76};
+	
+	struct Triangle tri = {
+		{p1, p2, p3},
+	};
 
-	draw_line(surface, p1, p2);
+	SDL_LockSurface(surface);
+
+	draw_triangle(surface, tri);
+
+	struct Point pp1 = {90, 160};
+	struct Point pp2 = {320, 360};
+	
+	draw_line(surface, pp1, pp2);
+	SDL_UnlockSurface(surface);
 	SDL_UpdateWindowSurface(window);
 	/* SDL_DestroyWindow(window); */
 }

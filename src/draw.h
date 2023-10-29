@@ -27,4 +27,6 @@ Uint32 get_pixel(SDL_Surface *surface, int x, int y);
 
 void draw_line(SDL_Surface *surface, struct Point p1, struct Point p2);
 
+void draw_triangle(SDL_Surface *surface, struct Triangle tri);
+
 #endif // SREND_DRAW_H_
