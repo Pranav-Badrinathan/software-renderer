@@ -1,10 +1,53 @@
 #include "defs.h"
+#include "linalg.h"
 #include "draw.h"
 #include <SDL2/SDL_surface.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
+
+void draw_cube(SDL_Surface *surface) {
+	struct Triangle cube[12] = {
+		(struct Triangle) {(struct Vec3){0, 0, 0}, (struct Vec3){0, 1, 0}, (struct Vec3){1, 1, 0}},
+		(struct Triangle) {(struct Vec3){0, 0, 0}, (struct Vec3){1, 1, 0}, (struct Vec3){1, 0, 0}},
+
+		(struct Triangle) {(struct Vec3){1, 0, 0}, (struct Vec3){1, 1, 0}, (struct Vec3){1, 1, 1}},
+		(struct Triangle) {(struct Vec3){1, 0, 0}, (struct Vec3){1, 1, 1}, (struct Vec3){1, 0, 1}},
+
+		(struct Triangle) {(struct Vec3){1, 0, 1}, (struct Vec3){1, 1, 1}, (struct Vec3){0, 1, 1}},
+		(struct Triangle) {(struct Vec3){1, 0, 1}, (struct Vec3){0, 1, 1}, (struct Vec3){0, 0, 1}},
+
+		(struct Triangle) {(struct Vec3){0, 0, 1}, (struct Vec3){0, 1, 1}, (struct Vec3){0, 1, 0}},
+		(struct Triangle) {(struct Vec3){0, 0, 1}, (struct Vec3){0, 1, 0}, (struct Vec3){0, 0, 0}},
+
+		(struct Triangle) {(struct Vec3){0, 1, 0}, (struct Vec3){0, 1, 1}, (struct Vec3){1, 1, 1}},
+		(struct Triangle) {(struct Vec3){0, 1, 0}, (struct Vec3){1, 1, 1}, (struct Vec3){1, 1, 0}},
+
+		(struct Triangle) {(struct Vec3){1, 0, 1}, (struct Vec3){0, 0, 1}, (struct Vec3){0, 0, 0}},
+		(struct Triangle) {(struct Vec3){1, 0, 1}, (struct Vec3){0, 0, 0}, (struct Vec3){1, 0, 0}},
+	};
+
+	struct Mat4x4 proj = get_proj_matrix();
+
+	for (int i = 0; i < 12; i++) {
+		struct Triangle t;
+		for (int j = 0; j < 3; j++) {
+			cube[i].verts[j].z += 3.0f;
+
+			t.verts[j] = matrix_vec3_mul(proj, cube[i].verts[j]);
+
+			t.verts[j] = vector_add(t.verts[j], (struct Vec3){1, 1, 0});
+			
+			t.verts[j].x *= 0.5f * (float)SCREEN_WIDTH;
+			t.verts[j].y *= 0.5f * (float)SCREEN_HEIGHT;
+
+			printf("x: %f, y: %f\n", t.verts[j].x, t.verts[j].y);
+		}
+
+		draw_triangle(surface, t);
+	}
+}
 
 void init_sdl(void) {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -37,22 +80,10 @@ void init_sdl(void) {
 		exit(EXIT_FAILURE);
 	}
 	
-	struct Point p1 = {SCREEN_WIDTH/2, (SCREEN_HEIGHT/2) - 25};
-	struct Point p2 = {(SCREEN_WIDTH/2) - 90, (SCREEN_HEIGHT/2) + 99};
-	struct Point p3 = {(SCREEN_WIDTH/2) - 0, (SCREEN_HEIGHT/2) + 76};
-	
-	struct Triangle tri = {
-		{p1, p2, p3},
-	};
-
 	SDL_LockSurface(surface);
 
-	draw_triangle(surface, tri);
-
-	struct Point pp1 = {90, 160};
-	struct Point pp2 = {320, 360};
+	draw_cube(surface);
 	
-	draw_line(surface, pp1, pp2);
 	SDL_UnlockSurface(surface);
 	SDL_UpdateWindowSurface(window);
 	/* SDL_DestroyWindow(window); */

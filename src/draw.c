@@ -1,16 +1,8 @@
+#include "draw.h"
 #include "defs.h"
 #include <stdbool.h>
 #include <SDL2/SDL_surface.h>
 #include <stdlib.h>
-
-struct Point {
-	int x;
-	int y;
-};
-
-struct Triangle {
-	struct Point verts[3];
-};
 
 void put_pixel(SDL_Surface *surface, int x, int y, Uint32 pixel) {
 	int bpp = surface->format->BytesPerPixel;
@@ -78,50 +70,54 @@ Uint32 get_pixel(SDL_Surface *surface, int x, int y) {
 	}
 }
 
-void draw_line(SDL_Surface *surface, struct Point p1, struct Point p2) {
+void draw_line(SDL_Surface *surface, struct Vec3 p1, struct Vec3 p2) {
 	const int dx = p2.x - p1.x;
 	const int dy = p2.y - p1.y;
 
 	const int adx = abs(dx);
 	const int ady = abs(dy);
 
+	int x = p1.x;
+	int y = p1.y;
 	
 	if (adx >= ady) { // Case when the slope <= 1
 		int descision = 2 * ady - adx;
-
+	
 		for (int i = 0; i < adx; i++) {
-			put_pixel(surface,
-			 p1.x,
-			 p1.y,
-			 SDL_MapRGB(surface->format, 0xff, 0xff, 0xff));
-
+			if ((0 < x && x < (SCREEN_WIDTH)) && (0 < y && y < SCREEN_HEIGHT)) {
+				put_pixel(surface,
+				 x,
+				 y,
+				 SDL_MapRGB(surface->format, 0xff, 0xff, 0xff));
+			}
 			// Plus if the slope is positive, minus if negative.
-			p1.x = dx < 0 ? p1.x - 1 : p1.x + 1;
+			x = dx < 0 ? x - 1 : x + 1;
 
 			if (descision <= 0) {
 				descision += 2 * ady;
 			} else {
 				descision += (2 * ady) - (2 * adx);
 				// Plus if the slope is positive, minus if negative.
-				p1.y = dy < 0 ? p1.y - 1 : p1.y + 1;
+				y = dy < 0 ? y - 1 : y + 1;
 			}
 		}
 	} else { // When slope > 1
 		int descision = 2 * adx - ady;
 
 		for (int i = 0; i < ady; i++) {
-			put_pixel(surface,
-			 p1.x,
-			 p1.y,
-			 SDL_MapRGB(surface->format, 0xff, 0xff, 0xff));
-
-			p1.y = dy < 0 ? p1.y - 1 : p1.y + 1;
+			if ((0 < x && x < (SCREEN_WIDTH)) && (0 < y && y < SCREEN_HEIGHT)) {
+				put_pixel(surface,
+				 x,
+				 y,
+				 SDL_MapRGB(surface->format, 0xff, 0xff, 0xff));
+			}
+			y = dy < 0 ? y - 1 : y + 1;
 
 			if (descision <= 0) {
 				descision += 2 * adx;
 			} else {
 				descision += (2 * adx) - (2 * ady);
-				p1.x = dx < 0 ? p1.x - 1 : p1.x + 1;
+				x = dx < 0 ? x - 1 : x + 1;
 			}
 		}
 	}

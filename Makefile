@@ -1,4 +1,4 @@
-SOURCE = ./src/main.c ./src/draw.c
+SOURCE = ./src/main.c ./src/draw.c ./src/linalg.c
 COMPILER_FLAGS = -Ilib/SDL/include -Wall -mwindows
 EXEC = ./bin/renderer.exe
 
