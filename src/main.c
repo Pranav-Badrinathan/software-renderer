@@ -28,7 +28,8 @@ void draw_cube(SDL_Surface *surface) {
 		(struct Triangle) {(struct Vec4){1, 0, 1}, (struct Vec4){0, 0, 0}, (struct Vec4){1, 0, 0}},
 	};
 
-	struct Mat4x4 proj = get_proj_matrix();
+	struct Mat4x4 proj = get_proj_matrix(0.1f, 1000.0f, 90.0f, 
+									  (float)SCREEN_WIDTH/(float)SCREEN_HEIGHT);
 
 	for (int i = 0; i < 12; i++) {
 		struct Triangle t;

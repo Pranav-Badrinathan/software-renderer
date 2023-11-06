@@ -12,7 +12,10 @@ struct Mat4x4 {
 	float v[4][4];
 };
 
-struct Mat4x4 get_proj_matrix(void);
+struct Mat4x4 get_proj_matrix(const float near, 
+							  const float far, 
+							  const float fov, 
+							  const float aspect_ratio);
 
 struct Vec4 matrix_vec3_mul(struct Mat4x4 mat, struct Vec4 v);
 

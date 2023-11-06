@@ -57,17 +57,17 @@ struct Vec4 vector_norm(struct Vec4 v) {
 
 // MATRIX STUFFS
 
-struct Mat4x4 get_proj_matrix(void) {
+struct Mat4x4 get_proj_matrix(const float near, 
+							  const float far, 
+							  const float fov, 
+							  const float aspect_ratio) {
+
 	// Initialize matrix to 0;
 	struct Mat4x4 mat = {0};
 
-	const float near = 0.1f;
-	const float far = 1000.0f;
-	const float fov = 90.0f;
-	const float aspect = (float)SCREEN_HEIGHT / (float)SCREEN_WIDTH;
 	const float atan = 1.0f / tanf(fov * 0.5f / 180 *(float)M_PI);
 
-	mat.v[0][0] = aspect * atan;
+	mat.v[0][0] = aspect_ratio * atan;
 	mat.v[1][1] = atan;
 	mat.v[2][2] = far / (far - near);
 	mat.v[3][2] = (-far * near) / (far - near);
