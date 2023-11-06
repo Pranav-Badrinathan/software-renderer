@@ -6,7 +6,7 @@
 
 // STRUCTS
 
-struct Triangle { struct Vec3 verts[3]; };
+struct Triangle { struct Vec4 verts[3]; };
 
 // END STRUCTS
 
@@ -24,7 +24,7 @@ void put_pixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
 Uint32 get_pixel(SDL_Surface *surface, int x, int y);
 
 
-void draw_line(SDL_Surface *surface, struct Vec3 p1, struct Vec3 p2);
+void draw_line(SDL_Surface *surface, struct Vec4 p1, struct Vec4 p2);
 
 void draw_triangle(SDL_Surface *surface, struct Triangle tri);
 

@@ -70,7 +70,7 @@ Uint32 get_pixel(SDL_Surface *surface, int x, int y) {
 	}
 }
 
-void draw_line(SDL_Surface *surface, struct Vec3 p1, struct Vec3 p2) {
+void draw_line(SDL_Surface *surface, struct Vec4 p1, struct Vec4 p2) {
 	const int dx = p2.x - p1.x;
 	const int dy = p2.y - p1.y;
 
