@@ -3,6 +3,7 @@
 #include "draw.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
@@ -56,7 +57,7 @@ void draw_cube(SDL_Surface *surface) {
 			t.verts[j].x *= 0.5f * (float)SCREEN_WIDTH;
 			t.verts[j].y *= 0.5f * (float)SCREEN_HEIGHT;
 
-			printf("x: %f, y: %f\n", t.verts[j].x, t.verts[j].y);
+			/* printf("x: %f, y: %f\n", t.verts[j].x, t.verts[j].y); */
 		}
 
 		draw_triangle(surface, t);
@@ -122,11 +123,18 @@ int main(int argc, char *argv[]) {
 	init_sdl();
 	atexit(cleanup);
 
+	float start_time = (float)clock()/CLOCKS_PER_SEC;
 	// Main "game" loop.
-	while (1) {
+	int i = 0;
+	while (i < 10000) {
 		handle_input();
 		draw_loop();
+		i++;
 	}
+
+	float end_time = (float)clock()/CLOCKS_PER_SEC;
+
+	printf("Time taken: %f\n", end_time - start_time);
 
 	return EXIT_SUCCESS;
 }

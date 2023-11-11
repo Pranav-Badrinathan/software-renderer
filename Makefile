@@ -1,5 +1,5 @@
 SOURCE = ./src/main.c ./src/draw.c ./src/linalg.c
-COMPILER_FLAGS = -Ilib/SDL/include -Wall -mwindows
+COMPILER_FLAGS = -Ilib/SDL/include -Wall 
 EXEC = ./bin/renderer.exe
 
 LINKER_FLAGS = -Llib/SDL/lib -lmingw32 -lSDL2main -lSDL2
