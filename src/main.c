@@ -1,11 +1,20 @@
 #include "defs.h"
 #include "linalg.h"
 #include "draw.h"
-#include <SDL2/SDL_surface.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <SDL2/SDL_surface.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
+
+SDL_Window *window;
+
+void err_if_null(void *ptr, char *str) {
+	if (!ptr) {
+		fprintf(stderr, str);
+		exit(EXIT_FAILURE);
+	}
+}
 
 void draw_cube(SDL_Surface *surface) {
 	struct Triangle cube[12] = {
@@ -29,14 +38,17 @@ void draw_cube(SDL_Surface *surface) {
 	};
 
 	struct Mat4x4 proj = get_proj_matrix(0.1f, 1000.0f, 90.0f, 
-									  (float)SCREEN_WIDTH/(float)SCREEN_HEIGHT);
+									  (float)SCREEN_HEIGHT/(float)SCREEN_WIDTH);
 
 	for (int i = 0; i < 12; i++) {
 		struct Triangle t;
 		for (int j = 0; j < 3; j++) {
+			// This can be done with a model matrix.
 			cube[i].verts[j].z += 3.0f;
 
+			// Projection matrix step.
 			t.verts[j] = matrix_vec3_mul(proj, cube[i].verts[j]);
+			// Projection division step.
 			t.verts[j] = vector_div(t.verts[j], t.verts[j].w);
 
 			t.verts[j] = vector_add(t.verts[j], (struct Vec4){1, 1, 0});
@@ -57,9 +69,6 @@ void init_sdl(void) {
 		exit(EXIT_FAILURE);
 	}
 
-	SDL_Window *window;
-	SDL_Surface *surface;
-
 	// Setting x and y pos to SDL_WINDOW_POS_UNDEFINED leaves window positioning
 	// upto the OS
 	window = SDL_CreateWindow(
@@ -69,29 +78,10 @@ void init_sdl(void) {
 		SCREEN_WIDTH, SCREEN_HEIGHT, 
 		SDL_WINDOW_RESIZABLE
 	);
-
-	if (window == NULL) {
-		printf("Unable to open window.");
-		exit(EXIT_FAILURE);
-	}
-
-	surface = SDL_GetWindowSurface(window);
-
-	if (surface == NULL) {
-		printf("Unable to get the window surface!");
-		exit(EXIT_FAILURE);
-	}
-	
-	SDL_LockSurface(surface);
-
-	draw_cube(surface);
-	
-	SDL_UnlockSurface(surface);
-	SDL_UpdateWindowSurface(window);
-	/* SDL_DestroyWindow(window); */
+	err_if_null(window, "Couldn't initialize SDL Window. Returned NULL!");
 }
 
-void do_input(void) {
+void handle_input(void) {
 	SDL_Event event;
 
 	// Handle all events sequentially. Puts event data to SDL_Event pointer.
@@ -107,8 +97,23 @@ void do_input(void) {
 	}
 }
 
+void draw_loop(void) {
+	err_if_null(window, "Couldn't initialize SDL Window. Returned NULL!");
+
+	SDL_Surface *surface = SDL_GetWindowSurface(window);
+	err_if_null(surface, "Couldn't initialize SDL Surface. Returned NULL!");
+
+	SDL_LockSurface(surface);
+
+	draw_cube(surface);
+	
+	SDL_UnlockSurface(surface);
+	SDL_UpdateWindowSurface(window);
+}
+
 void cleanup(void) {
 	// Handle application closing
+	SDL_DestroyWindow(window);
 	SDL_Quit();
 }
 
@@ -119,7 +124,8 @@ int main(int argc, char *argv[]) {
 
 	// Main "game" loop.
 	while (1) {
-		do_input();
+		handle_input();
+		draw_loop();
 	}
 
 	return EXIT_SUCCESS;
