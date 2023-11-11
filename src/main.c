@@ -46,13 +46,13 @@ void draw_cube(SDL_Surface *surface) {
 		for (int j = 0; j < 3; j++) {
 			// This can be done with a model matrix.
 			cube[i].verts[j].z += 3.0f;
-
+			t.verts[j] = cube[i].verts[j];
 			// Projection matrix step.
-			t.verts[j] = matrix_vec3_mul(proj, cube[i].verts[j]);
+			matrix_vec3_mul(proj, &t.verts[j]);
 			// Projection division step.
-			t.verts[j] = vector_div(t.verts[j], t.verts[j].w);
+			vector_div(&t.verts[j], t.verts[j].w);
 
-			t.verts[j] = vector_add(t.verts[j], (struct Vec4){1, 1, 0});
+			vector_add(&t.verts[j], (struct Vec4){1, 1, 0});
 			
 			t.verts[j].x *= 0.5f * (float)SCREEN_WIDTH;
 			t.verts[j].y *= 0.5f * (float)SCREEN_HEIGHT;
