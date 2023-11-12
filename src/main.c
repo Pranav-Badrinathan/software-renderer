@@ -47,11 +47,11 @@ void draw_cube(SDL_Surface *surface) {
 			cube[i].verts[j].z += 3.0f;
 
 			// Projection matrix step.
-			t.verts[j] = matrix_vec3_mul(proj, cube[i].verts[j]);
+			t.verts[j] = matrix_vec3_mul(&proj, &cube[i].verts[j]);
 			// Projection division step.
-			t.verts[j] = vector_div(t.verts[j], t.verts[j].w);
+			t.verts[j] = vector_div(&t.verts[j], t.verts[j].w);
 
-			t.verts[j] = vector_add(t.verts[j], (struct Vec4){1, 1, 0});
+			t.verts[j] = vector_add(&t.verts[j], &((struct Vec4){1, 1, 0}));
 			
 			t.verts[j].x *= 0.5f * (float)SCREEN_WIDTH;
 			t.verts[j].y *= 0.5f * (float)SCREEN_HEIGHT;
