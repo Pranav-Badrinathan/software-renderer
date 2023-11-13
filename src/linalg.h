@@ -56,7 +56,7 @@ struct Vec4 matrix_vec3_mul(struct Mat4x4 *mat, struct Vec4 *v);
 
 // Multiply two 4x4 matrices together.
 // returns: the resulting multiplied matrix.
-struct Mat4x4 matrix_matrix_mul(struct Mat4x4 *mat1, struct Mat4x4 *mat2);
+struct Mat4x4 matrix_matrix_mul(struct Mat4x4 mat1, struct Mat4x4 mat2);
 
 // Transpose a given matrix from Row to Column or vice versa.
 // returns: the transposed matrix.
@@ -67,5 +67,10 @@ struct Mat4x4 get_proj_matrix(const float near,
 							  const float far, 
 							  const float fov, 
 							  const float aspect_ratio);
+
+// Return a model matrix based on given values.
+struct Mat4x4 get_model_matrix(const struct Vec4 *rot, 
+							   const struct Vec4 *trans, 
+							   const struct Vec4 *scale);
 
 #endif

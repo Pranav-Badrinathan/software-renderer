@@ -82,13 +82,13 @@ struct Mat4x4 matrix_transpose(struct Mat4x4 *mat) {
 	return ret;
 }
 
-struct Mat4x4 matrix_matrix_mul(struct Mat4x4 *mat1, struct Mat4x4 *mat2) {
+struct Mat4x4 matrix_matrix_mul(struct Mat4x4 mat1, struct Mat4x4 mat2) {
 	struct Mat4x4 ret = {0};
 
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			for (int k = 0; k < 4; k++) {
-				ret.v[i][j] += mat1->v[i][k] * mat2->v[k][j];
+				ret.v[i][j] += mat2.v[i][k] * mat1.v[k][j];
 			}
 		}
 	}
@@ -97,6 +97,16 @@ struct Mat4x4 matrix_matrix_mul(struct Mat4x4 *mat1, struct Mat4x4 *mat2) {
 }
 
 // PREDEFINED MATRICIES
+
+struct Mat4x4 get_identity_matrix(void) {
+	struct Mat4x4 identity = {0};
+	identity.v[0][0] = 1.0f;
+	identity.v[1][1] = 1.0f;
+	identity.v[2][2] = 1.0f;
+	identity.v[3][3] = 1.0f;
+
+	return identity;
+}
 
 struct Mat4x4 get_proj_matrix(const float near, 
 							  const float far, 
@@ -118,7 +128,7 @@ struct Mat4x4 get_proj_matrix(const float near,
 }
 
 struct Mat4x4 get_xrot_matrix(const float angle) {
-	struct Mat4x4 mat = {0};
+	struct Mat4x4 mat = get_identity_matrix();
 	mat.v[1][1] = cosf(angle);
 	mat.v[2][2] = cosf(angle);
 	mat.v[2][1] = -sinf(angle);
@@ -128,7 +138,7 @@ struct Mat4x4 get_xrot_matrix(const float angle) {
 }
 
 struct Mat4x4 get_yrot_matrix(const float angle) {
-	struct Mat4x4 mat = {0};
+	struct Mat4x4 mat = get_identity_matrix();
 	mat.v[0][0] = cosf(angle);
 	mat.v[2][2] = cosf(angle);
 	mat.v[0][2] = -sinf(angle);
@@ -138,11 +148,44 @@ struct Mat4x4 get_yrot_matrix(const float angle) {
 }
 
 struct Mat4x4 get_zrot_matrix(const float angle) {
-	struct Mat4x4 mat = {0};
+	struct Mat4x4 mat = get_identity_matrix();
 	mat.v[0][0] = cosf(angle);
 	mat.v[1][1] = cosf(angle);
 	mat.v[1][0] = -sinf(angle);
 	mat.v[0][1] = sinf(angle);
 
 	return mat;
+}
+
+struct Mat4x4 get_scale_matrix(const struct Vec4 *scale) {
+	struct Mat4x4 mat = get_identity_matrix();
+
+	mat.v[0][0] = scale->x;
+	mat.v[1][1] = scale->y;
+	mat.v[2][2] = scale->z;
+	return mat;
+}
+
+struct Mat4x4 get_trans_matrix(const struct Vec4 *trans) {
+
+	struct Mat4x4 mat = get_identity_matrix();
+
+	mat.v[3][0] = trans->x;
+	mat.v[3][1] = trans->y;
+	mat.v[3][2] = trans->z;
+	return mat;
+}
+
+struct Mat4x4 get_model_matrix(const struct Vec4 *rot, 
+							   const struct Vec4 *trans, 
+							   const struct Vec4 *scale) {
+	struct Mat4x4 m_scale = get_scale_matrix(scale);
+	struct Mat4x4 m_rot = 
+		matrix_matrix_mul(
+			matrix_matrix_mul(get_xrot_matrix(rot->x), get_yrot_matrix(rot->y)), 
+			get_zrot_matrix(rot->z));
+	struct Mat4x4 m_trans = get_trans_matrix(trans);
+
+	
+	return matrix_matrix_mul(matrix_matrix_mul(m_scale, m_rot), m_trans);
 }
