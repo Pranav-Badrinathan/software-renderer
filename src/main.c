@@ -18,36 +18,51 @@ void err_if_null(void *ptr, char *str) {
 
 void draw_cube(SDL_Surface *surface) {
 	struct Triangle cube[12] = {
-		(struct Triangle) {(struct Vec4){0, 0, 0}, (struct Vec4){0, 1, 0}, (struct Vec4){1, 1, 0}},
-		(struct Triangle) {(struct Vec4){0, 0, 0}, (struct Vec4){1, 1, 0}, (struct Vec4){1, 0, 0}},
+		(struct Triangle) {(struct Vec4){0, 0, 0, 1}, (struct Vec4){0, 1, 0, 1}, (struct Vec4){1, 1, 0, 1}},
+		(struct Triangle) {(struct Vec4){0, 0, 0, 1}, (struct Vec4){1, 1, 0, 1}, (struct Vec4){1, 0, 0, 1}},
 
-		(struct Triangle) {(struct Vec4){1, 0, 0}, (struct Vec4){1, 1, 0}, (struct Vec4){1, 1, 1}},
-		(struct Triangle) {(struct Vec4){1, 0, 0}, (struct Vec4){1, 1, 1}, (struct Vec4){1, 0, 1}},
+		(struct Triangle) {(struct Vec4){1, 0, 0, 1}, (struct Vec4){1, 1, 0, 1}, (struct Vec4){1, 1, 1, 1}},
+		(struct Triangle) {(struct Vec4){1, 0, 0, 1}, (struct Vec4){1, 1, 1, 1}, (struct Vec4){1, 0, 1, 1}},
 
-		(struct Triangle) {(struct Vec4){1, 0, 1}, (struct Vec4){1, 1, 1}, (struct Vec4){0, 1, 1}},
-		(struct Triangle) {(struct Vec4){1, 0, 1}, (struct Vec4){0, 1, 1}, (struct Vec4){0, 0, 1}},
+		(struct Triangle) {(struct Vec4){1, 0, 1, 1}, (struct Vec4){1, 1, 1, 1}, (struct Vec4){0, 1, 1, 1}},
+		(struct Triangle) {(struct Vec4){1, 0, 1, 1}, (struct Vec4){0, 1, 1, 1}, (struct Vec4){0, 0, 1, 1}},
 
-		(struct Triangle) {(struct Vec4){0, 0, 1}, (struct Vec4){0, 1, 1}, (struct Vec4){0, 1, 0}},
-		(struct Triangle) {(struct Vec4){0, 0, 1}, (struct Vec4){0, 1, 0}, (struct Vec4){0, 0, 0}},
+		(struct Triangle) {(struct Vec4){0, 0, 1, 1}, (struct Vec4){0, 1, 1, 1}, (struct Vec4){0, 1, 0, 1}},
+		(struct Triangle) {(struct Vec4){0, 0, 1, 1}, (struct Vec4){0, 1, 0, 1}, (struct Vec4){0, 0, 0, 1}},
 
-		(struct Triangle) {(struct Vec4){0, 1, 0}, (struct Vec4){0, 1, 1}, (struct Vec4){1, 1, 1}},
-		(struct Triangle) {(struct Vec4){0, 1, 0}, (struct Vec4){1, 1, 1}, (struct Vec4){1, 1, 0}},
+		(struct Triangle) {(struct Vec4){0, 1, 0, 1}, (struct Vec4){0, 1, 1, 1}, (struct Vec4){1, 1, 1, 1}},
+		(struct Triangle) {(struct Vec4){0, 1, 0, 1}, (struct Vec4){1, 1, 1, 1}, (struct Vec4){1, 1, 0, 1}},
 
-		(struct Triangle) {(struct Vec4){1, 0, 1}, (struct Vec4){0, 0, 1}, (struct Vec4){0, 0, 0}},
-		(struct Triangle) {(struct Vec4){1, 0, 1}, (struct Vec4){0, 0, 0}, (struct Vec4){1, 0, 0}},
+		(struct Triangle) {(struct Vec4){1, 0, 1, 1}, (struct Vec4){0, 0, 1, 1}, (struct Vec4){0, 0, 0, 1}},
+		(struct Triangle) {(struct Vec4){1, 0, 1, 1}, (struct Vec4){0, 0, 0, 1}, (struct Vec4){1, 0, 0, 1}},
 	};
 
 	struct Mat4x4 proj = get_proj_matrix(0.1f, 1000.0f, 90.0f, 
 									  (float)SCREEN_HEIGHT/(float)SCREEN_WIDTH);
 
+	struct Mat4x4 model = get_model_matrix(&(struct Vec4){0.0f, 0.0f, 0.0f}, 
+										   &(struct Vec4){0.0f, 0.0f, 3.0f}, 
+										   &(struct Vec4){1.0f, 1.0f, 1.0f});
+
+/*	for (int i = 0; i < 4; i++) {
+		printf("| ");
+		for (int j = 0; j < 4; j++) {
+			printf("%.2f ", model.v[j][i]);
+		}
+		printf("|\n");
+	}
+	printf("----------\n"); */
+
 	for (int i = 0; i < 12; i++) {
 		struct Triangle t;
 		for (int j = 0; j < 3; j++) {
+			t.verts[j] = cube[i].verts[j];
+
 			// This can be done with a model matrix.
-			cube[i].verts[j].z += 3.0f;
+			t.verts[j] = matrix_vec3_mul(&model, &t.verts[j]);
 
 			// Projection matrix step.
-			t.verts[j] = matrix_vec3_mul(&proj, &cube[i].verts[j]);
+			t.verts[j] = matrix_vec3_mul(&proj, &t.verts[j]);
 			// Projection division step.
 			t.verts[j] = vector_div(&t.verts[j], t.verts[j].w);
 
@@ -56,7 +71,7 @@ void draw_cube(SDL_Surface *surface) {
 			t.verts[j].x *= 0.5f * (float)SCREEN_WIDTH;
 			t.verts[j].y *= 0.5f * (float)SCREEN_HEIGHT;
 
-			printf("x: %f, y: %f\n", t.verts[j].x, t.verts[j].y);
+			/* printf("x: %f, y: %f, w: %f\n", t.verts[j].x, t.verts[j].y, t.verts[j].w); */
 		}
 
 		draw_triangle(surface, t);
