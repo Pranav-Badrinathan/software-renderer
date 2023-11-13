@@ -15,9 +15,9 @@ struct Vec4 vector_add(struct Vec4 *v1, struct Vec4 *v2) {
 
 struct Vec4 vector_sub(struct Vec4 *v1, struct Vec4 *v2) {
 	return (struct Vec4) {
-		v1->x + v2->x,
-		v1->y + v2->y,
-		v1->z + v2->z,
+		v1->x - v2->x,
+		v1->y - v2->y,
+		v1->z - v2->z,
 	};
 }
 

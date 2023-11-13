@@ -1,6 +1,7 @@
 #ifndef SREND_LINALG_H_
 #define SREND_LINALG_H_
 
+// 4D Homogeneous Vectors
 struct Vec4 {
 	float x;
 	float y;
@@ -8,20 +9,63 @@ struct Vec4 {
 	float w;
 };
 
+// 4x4 Matricies to work with 4D Homogeneous Vectors.
 struct Mat4x4 {
 	float v[4][4];
 };
 
+// VECTOR FUNCTIONS
+
+// Scale a vector value by a scalar.
+// returns: the scaled vector.
+struct Vec4 vector_mul(struct Vec4 *v1, float scalar);
+
+// REDUNTANT. vector_mul can also do this. REMOVE LATER.
+// Divide a vector value by a scalar.
+struct Vec4 vector_div(struct Vec4 *v1, float divisor);
+
+// Add two vectors together.
+// returns: the addition of the two provided vectors.
+struct Vec4 vector_add(struct Vec4 *v1, struct Vec4 *v2);
+
+// Subtract two vectors.
+// returns: the difference of two given vectors.
+struct Vec4 vector_sub(struct Vec4 *v1, struct Vec4 *v2);
+
+// Normalize a vector (set it's magnitude to 1 while maintaining direction)
+// returns: the normalized vector.
+struct Vec4 vector_norm(struct Vec4 *v);
+
+// Get the magnitude of a given vector.
+// returns: the magnitude of the vector.
+float vector_mag(struct Vec4 *v);
+
+// Get the dot product of two given vectors.
+// returns: the dot product.
+float vector_dot(struct Vec4 *v1, struct Vec4 *v2);
+
+// Get the cross product of two given vectors.
+// returns: the cross product of the vectors.
+struct Vec4 vector_cross(struct Vec4 *u, struct Vec4 *v);
+
+// MATRIX FUNCTIONS
+
+// Apply a matrix transformation to a vector.
+// returns: the transformed vector.
+struct Vec4 matrix_vec3_mul(struct Mat4x4 *mat, struct Vec4 *v);
+
+// Multiply two 4x4 matrices together.
+// returns: the resulting multiplied matrix.
+struct Mat4x4 matrix_matrix_mul(struct Mat4x4 *mat1, struct Mat4x4 *mat2);
+
+// Transpose a given matrix from Row to Column or vice versa.
+// returns: the transposed matrix.
+struct Mat4x4 matrix_transpose(struct Mat4x4 *mat);
+
+// Return a Projection Matrix based on given values. 
 struct Mat4x4 get_proj_matrix(const float near, 
 							  const float far, 
 							  const float fov, 
 							  const float aspect_ratio);
-
-struct Vec4 matrix_vec3_mul(struct Mat4x4 *mat, struct Vec4 *v);
-
-struct Vec4 vector_mul(struct Vec4 *v1, float scalar);
-struct Vec4 vector_div(struct Vec4 *v1, float divisor);
-
-struct Vec4 vector_add(struct Vec4 *v1, struct Vec4 *v2);
 
 #endif
