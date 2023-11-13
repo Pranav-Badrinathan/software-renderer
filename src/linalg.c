@@ -88,7 +88,7 @@ struct Mat4x4 matrix_matrix_mul(struct Mat4x4 mat1, struct Mat4x4 mat2) {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			for (int k = 0; k < 4; k++) {
-				ret.v[i][j] += mat2.v[i][k] * mat1.v[k][j];
+				ret.v[i][j] += mat1.v[i][k] * mat2.v[k][j];
 			}
 		}
 	}

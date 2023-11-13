@@ -16,7 +16,7 @@ void err_if_null(void *ptr, char *str) {
 	}
 }
 
-void draw_cube(SDL_Surface *surface) {
+void draw_cube(SDL_Surface *surface, long delta) {
 	struct Triangle cube[12] = {
 		(struct Triangle) {(struct Vec4){0, 0, 0, 1}, (struct Vec4){0, 1, 0, 1}, (struct Vec4){1, 1, 0, 1}},
 		(struct Triangle) {(struct Vec4){0, 0, 0, 1}, (struct Vec4){1, 1, 0, 1}, (struct Vec4){1, 0, 0, 1}},
@@ -40,8 +40,8 @@ void draw_cube(SDL_Surface *surface) {
 	struct Mat4x4 proj = get_proj_matrix(0.1f, 1000.0f, 90.0f, 
 									  (float)SCREEN_HEIGHT/(float)SCREEN_WIDTH);
 
-	struct Mat4x4 model = get_model_matrix(&(struct Vec4){0.0f, 0.0f, 0.0f}, 
-										   &(struct Vec4){0.0f, 0.0f, 3.0f}, 
+	struct Mat4x4 model = get_model_matrix(&(struct Vec4){delta * 0.0005f, delta * 0.0005f, 0.0f},
+										   &(struct Vec4){0.0f, 0.0f, 3.0f},
 										   &(struct Vec4){1.0f, 1.0f, 1.0f});
 
 /*	for (int i = 0; i < 4; i++) {
@@ -112,15 +112,16 @@ void handle_input(void) {
 	}
 }
 
-void draw_loop(void) {
+void draw_loop(long delta) {
 	err_if_null(window, "Couldn't initialize SDL Window. Returned NULL!");
 
 	SDL_Surface *surface = SDL_GetWindowSurface(window);
 	err_if_null(surface, "Couldn't initialize SDL Surface. Returned NULL!");
 
 	SDL_LockSurface(surface);
+	SDL_FillRect(surface, NULL, 0x000000);
 
-	draw_cube(surface);
+	draw_cube(surface, delta);
 	
 	SDL_UnlockSurface(surface);
 	SDL_UpdateWindowSurface(window);
@@ -138,9 +139,11 @@ int main(int argc, char *argv[]) {
 	atexit(cleanup);
 
 	// Main "game" loop.
+	long delta = 0;
 	while (1) {
 		handle_input();
-		draw_loop();
+		draw_loop(delta);
+		delta++;
 	}
 
 	return EXIT_SUCCESS;
