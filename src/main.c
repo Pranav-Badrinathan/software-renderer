@@ -1,13 +1,17 @@
 #include "defs.h"
 #include "linalg.h"
 #include "draw.h"
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
 
 SDL_Window *window;
+struct Vec4 inp_rots = {0};
+struct Vec4 ind_rots = {0};
 
 void err_if_null(void *ptr, char *str) {
 	if (!ptr) {
@@ -40,7 +44,7 @@ void draw_cube(SDL_Surface *surface, long delta) {
 	struct Mat4x4 proj = get_proj_matrix(0.1f, 1000.0f, 90.0f, 
 									  (float)SCREEN_HEIGHT/(float)SCREEN_WIDTH);
 
-	struct Mat4x4 model = get_model_matrix(&(struct Vec4){delta * 0.0005f, delta * 0.0005f, 0.0f},
+	struct Mat4x4 model = get_model_matrix(&inp_rots,
 										   &(struct Vec4){0.0f, 0.0f, 3.0f},
 										   &(struct Vec4){1.0f, 1.0f, 1.0f});
 
@@ -106,6 +110,24 @@ void handle_input(void) {
 				exit(EXIT_SUCCESS);
 				break;
 
+			case SDL_KEYDOWN:
+					if (event.key.keysym.scancode == SDL_SCANCODE_S) ind_rots.x =  0.0005;
+					if (event.key.keysym.scancode == SDL_SCANCODE_W) ind_rots.x = -0.0005;
+					if (event.key.keysym.scancode == SDL_SCANCODE_A) ind_rots.y =  0.0005;
+					if (event.key.keysym.scancode == SDL_SCANCODE_D) ind_rots.y = -0.0005;
+					if (event.key.keysym.scancode == SDL_SCANCODE_Q) ind_rots.z =  0.0005;
+					if (event.key.keysym.scancode == SDL_SCANCODE_E) ind_rots.z = -0.0005;
+				break;
+
+			case SDL_KEYUP:
+					if (event.key.keysym.scancode == SDL_SCANCODE_W) ind_rots.x = 0;
+					if (event.key.keysym.scancode == SDL_SCANCODE_S) ind_rots.x = 0;
+					if (event.key.keysym.scancode == SDL_SCANCODE_A) ind_rots.y = 0;
+					if (event.key.keysym.scancode == SDL_SCANCODE_D) ind_rots.y = 0;
+					if (event.key.keysym.scancode == SDL_SCANCODE_Q) ind_rots.z = 0;
+					if (event.key.keysym.scancode == SDL_SCANCODE_E) ind_rots.z = 0;
+				break;
+
 			default:
 				break;
 		}
@@ -142,6 +164,7 @@ int main(int argc, char *argv[]) {
 	long delta = 0;
 	while (1) {
 		handle_input();
+		inp_rots = vector_add(&inp_rots, &ind_rots);
 		draw_loop(delta);
 		delta++;
 	}
