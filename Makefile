@@ -1,18 +1,40 @@
-SOURCE = ./src/main.c ./src/draw.c ./src/linalg.c ./src/input.c
-COMPILER_FLAGS = -Ilib/SDL/include -Wall -mwindows
+# Compiler, compiler and Linker flags.
+CC=gcc
+CFLAGS = -Ilib/SDL/include -Wall -mwindows -MMD
+LDFLAGS = -Llib/SDL/lib -Lbin/obj -lmingw32 -lSDL2main -lSDL2
+
+# Source dir, object and dependency file gen dir.
+SRCDIR = ./src
+OBJDIR = ./bin/obj
+
+# Source, object and dependency file names. 
+SRCS = $(wildcard $(SRCDIR)/*.c)
+OBJS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
+DEPS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.d, $(SRCS))
 EXEC = ./bin/renderer.exe
 
-LINKER_FLAGS = -Llib/SDL/lib -lmingw32 -lSDL2main -lSDL2
+.PHONY: init run clean
 
-CC=gcc
-
-run: compile $(EXEC)
+# Build if needed and run the executable produced.
+run: $(EXEC)
 	$(EXEC)
 
-compile: $(SOURCE)
-	$(CC) $(SOURCE) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(EXEC)
+$(EXEC): $(OBJS)
+	$(CC) $(OBJS) $(LDFLAGS) -o $(EXEC)
+
+$(OBJDIR)%.o: $(SRCDIR)%.c | $(OBJDIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+-include $(DEPS)
+
+$(OBJDIR):
+	@mkdir -p ./bin/obj
 
 init:
-	@$(shell mkdir bin)
-	@$(shell cp lib\SDL\bin\SDL2.dll bin\)
+	@mkdir -p bin
+	@cp ./lib/SDL/bin/SDL2.dll ./bin/
 	@echo Finished Initialization
+
+clean:
+	rm -f ./bin/obj/*.o ./bin/obj/*.d
+
