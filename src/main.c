@@ -1,9 +1,8 @@
 #include "defs.h"
 #include "linalg.h"
 #include "draw.h"
-#include <math.h>
+#include "input.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL.h>
@@ -11,13 +10,21 @@
 
 SDL_Window *window;
 struct Vec4 inp_rots = {0};
-struct Vec4 ind_rots = {0};
 
 void err_if_null(void *ptr, char *str) {
 	if (!ptr) {
 		fprintf(stderr, str);
 		exit(EXIT_FAILURE);
 	}
+}
+
+void cube_rotation(void) {
+	if (key_held(SDL_SCANCODE_W)) inp_rots.x += 0.0005;
+	if (key_held(SDL_SCANCODE_S)) inp_rots.x -= 0.0005;
+	if (key_held(SDL_SCANCODE_A)) inp_rots.y += 0.0005;
+	if (key_held(SDL_SCANCODE_D)) inp_rots.y -= 0.0005;
+	if (key_held(SDL_SCANCODE_Q)) inp_rots.z += 0.0005;
+	if (key_held(SDL_SCANCODE_E)) inp_rots.z -= 0.0005;
 }
 
 void draw_cube(SDL_Surface *surface, long delta) {
@@ -40,6 +47,8 @@ void draw_cube(SDL_Surface *surface, long delta) {
 		(struct Triangle) {(struct Vec4){1, 0, 1, 1}, (struct Vec4){0, 0, 1, 1}, (struct Vec4){0, 0, 0, 1}},
 		(struct Triangle) {(struct Vec4){1, 0, 1, 1}, (struct Vec4){0, 0, 0, 1}, (struct Vec4){1, 0, 0, 1}},
 	};
+
+	cube_rotation();
 
 	struct Mat4x4 proj = get_proj_matrix(0.1f, 1000.0f, 90.0f, 
 									  (float)SCREEN_HEIGHT/(float)SCREEN_WIDTH);
@@ -100,40 +109,6 @@ void init_sdl(void) {
 	err_if_null(window, "Couldn't initialize SDL Window. Returned NULL!");
 }
 
-void handle_input(void) {
-	SDL_Event event;
-
-	// Handle all events sequentially. Puts event data to SDL_Event pointer.
-	while (SDL_PollEvent(&event)) {
-		switch (event.type) {
-			case SDL_QUIT:
-				exit(EXIT_SUCCESS);
-				break;
-
-			case SDL_KEYDOWN:
-					if (event.key.keysym.scancode == SDL_SCANCODE_S) ind_rots.x =  0.0005;
-					if (event.key.keysym.scancode == SDL_SCANCODE_W) ind_rots.x = -0.0005;
-					if (event.key.keysym.scancode == SDL_SCANCODE_A) ind_rots.y =  0.0005;
-					if (event.key.keysym.scancode == SDL_SCANCODE_D) ind_rots.y = -0.0005;
-					if (event.key.keysym.scancode == SDL_SCANCODE_Q) ind_rots.z =  0.0005;
-					if (event.key.keysym.scancode == SDL_SCANCODE_E) ind_rots.z = -0.0005;
-				break;
-
-			case SDL_KEYUP:
-					if (event.key.keysym.scancode == SDL_SCANCODE_W) ind_rots.x = 0;
-					if (event.key.keysym.scancode == SDL_SCANCODE_S) ind_rots.x = 0;
-					if (event.key.keysym.scancode == SDL_SCANCODE_A) ind_rots.y = 0;
-					if (event.key.keysym.scancode == SDL_SCANCODE_D) ind_rots.y = 0;
-					if (event.key.keysym.scancode == SDL_SCANCODE_Q) ind_rots.z = 0;
-					if (event.key.keysym.scancode == SDL_SCANCODE_E) ind_rots.z = 0;
-				break;
-
-			default:
-				break;
-		}
-	}
-}
-
 void draw_loop(long delta) {
 	err_if_null(window, "Couldn't initialize SDL Window. Returned NULL!");
 
@@ -163,8 +138,7 @@ int main(int argc, char *argv[]) {
 	// Main "game" loop.
 	long delta = 0;
 	while (1) {
-		handle_input();
-		inp_rots = vector_add(&inp_rots, &ind_rots);
+		update_input();
 		draw_loop(delta);
 		delta++;
 	}

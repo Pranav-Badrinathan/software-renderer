@@ -1,7 +1,6 @@
 #include "draw.h"
 #include "defs.h"
 #include <stdbool.h>
-#include <SDL2/SDL_surface.h>
 #include <stdlib.h>
 
 void put_pixel(SDL_Surface *surface, int x, int y, Uint32 pixel) {
