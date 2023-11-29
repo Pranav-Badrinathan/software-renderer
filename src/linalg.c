@@ -38,7 +38,7 @@ struct Vec4 vector_div(struct Vec4 *v1, float divisor) {
 }
 
 float vector_dot(struct Vec4 *v1, struct Vec4 *v2) {
-	return (v1->x * v2->x) + (v1->y * v2->y) + (v1->z + v2->z);
+	return (v1->x * v2->x) + (v1->y * v2->y) + (v1->z * v2->z) + (v1->w * v2->w);
 }
 
 struct Vec4 vector_cross(struct Vec4 *u, struct Vec4 *v) {
@@ -110,18 +110,18 @@ struct Mat4x4 get_identity_matrix(void) {
 
 struct Mat4x4 get_proj_matrix(const float near, 
 							  const float far, 
-							  const float fov, 
+							  const float v_fov, 
 							  const float aspect_ratio) {
 	// Initialize matrix to 0;
 	struct Mat4x4 mat = {0};
 
-	const float atan = 1.0f / tanf(fov * 0.5f / 180 * (float)M_PI);
+	const float atan = 1.0f / tanf(v_fov/2);
 
 	mat.v[0][0] = aspect_ratio * atan;
 	mat.v[1][1] = atan;
 	mat.v[2][2] = far / (far - near);
 	mat.v[3][2] = (-far * near) / (far - near);
-	mat.v[2][3] = 1.0f;
+	mat.v[2][3] = -1.0f;
 	mat.v[3][3] = 0.0f;
 
 	return mat;
@@ -189,3 +189,41 @@ struct Mat4x4 get_model_matrix(const struct Vec4 *rot,
 	
 	return matrix_matrix_mul(matrix_matrix_mul(m_scale, m_rot), m_trans);
 }
+
+/* For a model matrix of form:, The view matrix is:
+*
+*  Model Matrix:		View Matrix:
+*  [ux vx wx tx]		[ux uy uz -dot(u,t)]
+*  [uy vy wy ty]		[vx vy vz -dot(v,t)]
+*  [uz vz wz tz]		[wx wy wz -dot(w,t)]
+*  [ 0  0  0  1]		[ 0  0  0     1    ]
+*  
+*  Notice the top 3x3 matrix in the view matrix is the transposed top 3x3
+*  of the model matrix. So, define the translation part (with dot prods)
+*  in the bottom row, and then transpose the whole matrix.
+*
+*  source: https://graphics.stanford.edu/courses/cs248-98-fall/Final/q4.html
+*/
+struct Mat4x4 get_view_matrix(const struct Mat4x4 cam_model) {
+	// Copy the Model matrix.
+	struct Mat4x4 view = cam_model;
+
+	// Get the individual vectors.
+	struct Vec4 u = { view.v[0][0], view.v[0][1], view.v[0][2] };
+	struct Vec4 v = { view.v[1][0], view.v[1][1], view.v[1][2] };
+	struct Vec4 w = { view.v[2][0], view.v[2][1], view.v[2][2] };
+	struct Vec4 t = { view.v[3][0], view.v[3][1], view.v[3][2] };
+
+	// Setup the bottom row as dot prods. Transposing will put it in place.
+	view.v[0][3] = -vector_dot(&u, &t);
+	view.v[1][3] = -vector_dot(&v, &t);
+	view.v[2][3] = -vector_dot(&w, &t);
+
+	// Zero out the last column.
+	view.v[3][0] = 0;
+    view.v[3][1] = 0;
+    view.v[3][2] = 0;
+
+	return matrix_transpose(&view);
+}
+

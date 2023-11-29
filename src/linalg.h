@@ -65,7 +65,7 @@ struct Mat4x4 matrix_transpose(struct Mat4x4 *mat);
 // Return a Projection Matrix based on given values. 
 struct Mat4x4 get_proj_matrix(const float near, 
 							  const float far, 
-							  const float fov, 
+							  const float v_fov, 
 							  const float aspect_ratio);
 
 // Return a model matrix based on given values.
@@ -73,4 +73,8 @@ struct Mat4x4 get_model_matrix(const struct Vec4 *rot,
 							   const struct Vec4 *trans, 
 							   const struct Vec4 *scale);
 
+// Take a camera's model matrix, invert it, and return it. This is 
+// called the view matrix.
+// returns: The view matrix related to a given model matrix.
+struct Mat4x4 get_view_matrix(const struct Mat4x4 cam_model);
 #endif

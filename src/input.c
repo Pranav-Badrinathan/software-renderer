@@ -25,7 +25,7 @@ bool key_just_released(int scode) {
 void update_input(void) {
 	SDL_Event event;
 
-	// Clear previous frame's frams specific inputs. Leave persistent.
+	// Clear previous frame's frams-specific inputs. Leave persistent.
 	for (int i = 0; i < SDL_NUM_SCANCODES; i++) {
 		keys[i] &= ~(KEY_JUST_PRESSED | KEY_JUST_RELEASED);
 	}
