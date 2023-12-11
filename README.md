@@ -24,3 +24,23 @@ software-renderer
 ```
 
 Then, just run the make file with `make init`, which creates a new `bin` folder and copies the SDL.dll into it. Running `make` after should build and run the project.
+
+## To do
+- [x] Draw Lines.
+- [x] Drawing triangles.
+- [x] 3D Projection.
+	- [x] Model matrix.
+	- [x] View matrix.
+	- [x] Perspective matrix.
+	- [x] Perspective division (**N**ormalized **D**evice **C**oordinates).
+	- [ ] Hide backfaces. Use triangle face normals and camera direction vector to stop them rendering.
+	- [ ] Convert to Clip Space.
+		- [ ] Discard vertices outside screen bounds.
+		- [ ] Re-triangulate broken triangles.
+- [ ] Set Camera movement to be relative to it's current orientation (not global).
+- [ ] 3D model importer (.obj).
+- [ ] An option to fill in faces. Shading?
+- [ ] Ray-tracing to figure out what object camera is looking at?
+- [ ] Simple UI to edit onscreen objects' transform properties.
+
+- [ ] Quaternion rotations?
