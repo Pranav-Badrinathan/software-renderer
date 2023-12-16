@@ -67,6 +67,11 @@ void draw_cube(SDL_Surface *surface, long delta) {
 										   &inp_trans,
 										   &(struct Vec4){1.0f, 1.0f, 1.0f});
 
+	struct Vec4 cam_dir = { cam_m.v[2][0], 
+							cam_m.v[2][1], 
+							cam_m.v[2][2], 
+							cam_m.v[2][3] };
+
 	struct Mat4x4 view = get_view_matrix(cam_m);
 
 	struct Mat4x4 model_view = matrix_matrix_mul(model, view);
@@ -101,7 +106,13 @@ void draw_cube(SDL_Surface *surface, long delta) {
 			/* printf("x: %f, y: %f, w: %f\n", t.verts[j].x, t.verts[j].y, t.verts[j].w); */
 		}
 
-		draw_triangle(surface, t);
+		struct Vec4 a = vector_sub(&t.verts[0], &t.verts[1]);
+		struct Vec4 b = vector_sub(&t.verts[1], &t.verts[2]);
+
+		struct Vec4 norm = vector_cross(&a, &b);
+		struct Vec4 tri_norm = vector_norm(&norm);
+
+		if (vector_dot(&tri_norm, &cam_dir) > 0) draw_triangle(surface, t);
 	}
 }
 
