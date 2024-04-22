@@ -1,7 +1,13 @@
 # Compiler, compiler and Linker flags.
 CC=gcc
-CFLAGS = -Ilib/SDL/include -Wall -mwindows -MMD
-LDFLAGS = -Llib/SDL/lib -Lbin/obj -lmingw32 -lSDL2main -lSDL2
+CFLAGS = -Ilib/SDL/include -Wall -MMD
+LDFLAGS = -Llib/SDL/lib -Lbin/obj -lm -lSDL2main -lSDL2
+
+# Platform conditional compilation
+ifeq ($(OS),Windows_NT)
+	CFLAGS += -mwindows
+	LDFLAGS += -lmingw32
+endif
 
 # Source dir, object and dependency file gen dir.
 SRCDIR = ./src
