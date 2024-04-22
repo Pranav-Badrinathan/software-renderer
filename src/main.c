@@ -15,7 +15,7 @@ struct Vec4 inp_trans = {0};
 
 void err_if_null(void *ptr, char *str) {
 	if (!ptr) {
-		fprintf(stderr, str);
+		fprintf(stderr, "%s", str);
 		exit(EXIT_FAILURE);
 	}
 }
