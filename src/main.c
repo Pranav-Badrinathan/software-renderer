@@ -1,4 +1,5 @@
 #include "defs.h"
+#include "gui.h"
 #include "linalg.h"
 #include "draw.h"
 #include "input.h"
@@ -158,13 +159,17 @@ void cleanup(void) {
 int main(int argc, char *argv[]) {
 	// As name suggests, initialize SDL.
 	init_sdl();
+	init_gui(window);
+
 	atexit(cleanup);
 
 	// Main "game" loop.
 	long delta = 0;
 	while (1) {
 		update_input();
+
 		draw_loop(delta);
+		draw_gui();
 		delta++;
 	}
 
