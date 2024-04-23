@@ -1,24 +1,24 @@
 # Compiler, compiler and Linker flags.
-CC=gcc
-CFLAGS = -Ilib/SDL/include -Wall -MMD
-LDFLAGS = -Llib/SDL/lib -Lbin/obj 
-LDLIBS = -lm -lSDL2main -lSDL2
+CC := gcc
+CFLAGS := -Ilib/SDL/include -Wall -MMD
+LDFLAGS := -Llib/SDL/lib -Lbin/obj 
+LDLIBS := -lm -lSDL2main -lSDL2
 
 # Platform conditional compilation
 ifeq ($(OS),Windows_NT)
 	CFLAGS += -mwindows
-	LDLIBS = -lmingw32 + $(LDLIBS)
+	LDLIBS := -lmingw32 $(LDLIBS)
 endif
 
 # Source dir, object and dependency file gen dir.
-SRCDIR = ./src
-OBJDIR = ./bin/obj
+SRCDIR := ./src
+OBJDIR := ./bin/obj
 
 # Source, object and dependency file names. 
-SRCS = $(wildcard $(SRCDIR)/*.c)
-OBJS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
-DEPS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.d, $(SRCS))
-EXEC = ./bin/renderer.exe
+SRCS := $(wildcard $(SRCDIR)/*.c)
+OBJS := $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
+DEPS := $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.d, $(SRCS))
+EXEC := ./bin/renderer.exe
 
 .PHONY: init run clean
 
