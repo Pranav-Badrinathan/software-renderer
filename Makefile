@@ -1,12 +1,13 @@
 # Compiler, compiler and Linker flags.
 CC=gcc
 CFLAGS = -Ilib/SDL/include -Wall -MMD
-LDFLAGS = -Llib/SDL/lib -Lbin/obj -lm -lSDL2main -lSDL2
+LDFLAGS = -Llib/SDL/lib -Lbin/obj 
+LDLIBS = -lm -lSDL2main -lSDL2
 
 # Platform conditional compilation
 ifeq ($(OS),Windows_NT)
 	CFLAGS += -mwindows
-	LDFLAGS += -lmingw32
+	LDLIBS = -lmingw32 + $(LDLIBS)
 endif
 
 # Source dir, object and dependency file gen dir.
@@ -26,7 +27,7 @@ run: $(EXEC)
 	$(EXEC)
 
 $(EXEC): $(OBJS)
-	$(CC) $(OBJS) $(LDFLAGS) -o $(EXEC)
+	$(CC) $(OBJS) $(LDFLAGS) $(LDLIBS) -o $(EXEC)
 
 $(OBJDIR)%.o: $(SRCDIR)%.c | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
