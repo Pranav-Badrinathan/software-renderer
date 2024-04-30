@@ -68,11 +68,6 @@ void draw_cube(SDL_Surface *surface, long delta) {
 										   &inp_trans,
 										   &(struct Vec4){1.0f, 1.0f, 1.0f});
 
-	struct Vec4 cam_dir = { cam_m.v[2][0], 
-							cam_m.v[2][1], 
-							cam_m.v[2][2], 
-							cam_m.v[2][3] };
-
 	struct Mat4x4 view = get_view_matrix(cam_m);
 
 	struct Mat4x4 model_view = matrix_matrix_mul(model, view);
@@ -108,12 +103,14 @@ void draw_cube(SDL_Surface *surface, long delta) {
 		}
 
 		struct Vec4 a = vector_sub(&t.verts[0], &t.verts[1]);
-		struct Vec4 b = vector_sub(&t.verts[1], &t.verts[2]);
+		struct Vec4 b = vector_sub(&t.verts[0], &t.verts[2]);
 
-		struct Vec4 norm = vector_cross(&a, &b);
-		struct Vec4 tri_norm = vector_norm(&norm);
+		// Positive if CCW, negative if CW. Only render CCW faces.
+		// 2D cross prod (determinant formula).
+		float winding_order = (a.x * b.y) - (b.x * a.y);
 
-		if (vector_dot(&tri_norm, &cam_dir) > 0) draw_triangle(surface, t);
+		// Only draw if winding in CCW. CW means backface.
+		if (winding_order > 0) draw_triangle(surface, t);
 	}
 }
 

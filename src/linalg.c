@@ -1,7 +1,5 @@
-#include "defs.h"
 #include "linalg.h"
 #include <math.h>
-#include <stdio.h>
 
 // VECTOR OPERATIONS
 
@@ -182,8 +180,12 @@ struct Mat4x4 get_model_matrix(const struct Vec4 *rot,
 	struct Mat4x4 m_scale = get_scale_matrix(scale);
 	struct Mat4x4 m_rot = 
 		matrix_matrix_mul(
-			matrix_matrix_mul(get_xrot_matrix(rot->x), get_yrot_matrix(rot->y)), 
-			get_zrot_matrix(rot->z));
+			matrix_matrix_mul(
+				get_xrot_matrix(rot->x),
+				get_yrot_matrix(rot->y)
+			),
+			get_zrot_matrix(rot->z)
+		);
 	struct Mat4x4 m_trans = get_trans_matrix(trans);
 
 	
