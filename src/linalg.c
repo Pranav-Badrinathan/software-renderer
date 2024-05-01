@@ -125,34 +125,33 @@ struct Mat4x4 get_proj_matrix(const float near,
 	return mat;
 }
 
-struct Mat4x4 get_xrot_matrix(const float angle) {
-	struct Mat4x4 mat = get_identity_matrix();
-	mat.v[1][1] = cosf(angle);
-	mat.v[2][2] = cosf(angle);
-	mat.v[2][1] = -sinf(angle);
-	mat.v[1][2] = sinf(angle);
+struct Mat4x4 get_rot_matrix(const struct Vec4 *rot) {
+	float cosX = cosf(rot->x);
+	float sinX = sinf(rot->x);
+	float cosY = cosf(rot->y);
+	float sinY = sinf(rot->y);
+	float cosZ = cosf(rot->z);
+	float sinZ = sinf(rot->z);
 
-	return mat;
-}
+	struct Mat4x4 mat_x = get_identity_matrix();
+	mat_x.v[1][1] = cosX;
+	mat_x.v[2][2] = cosX;
+	mat_x.v[2][1] = -sinX;
+	mat_x.v[1][2] = sinX;
 
-struct Mat4x4 get_yrot_matrix(const float angle) {
-	struct Mat4x4 mat = get_identity_matrix();
-	mat.v[0][0] = cosf(angle);
-	mat.v[2][2] = cosf(angle);
-	mat.v[0][2] = -sinf(angle);
-	mat.v[2][0] = sinf(angle);
+	struct Mat4x4 mat_y = get_identity_matrix();
+	mat_y.v[0][0] = cosY;
+	mat_y.v[2][2] = cosY;
+	mat_y.v[0][2] = -sinY;
+	mat_y.v[2][0] = sinY;
 
-	return mat;
-}
+	struct Mat4x4 mat_z = get_identity_matrix();
+	mat_z.v[0][0] = cosZ;
+	mat_z.v[1][1] = cosZ;
+	mat_z.v[1][0] = -sinZ;
+	mat_z.v[0][1] = sinZ;
 
-struct Mat4x4 get_zrot_matrix(const float angle) {
-	struct Mat4x4 mat = get_identity_matrix();
-	mat.v[0][0] = cosf(angle);
-	mat.v[1][1] = cosf(angle);
-	mat.v[1][0] = -sinf(angle);
-	mat.v[0][1] = sinf(angle);
-
-	return mat;
+	return matrix_matrix_mul(matrix_matrix_mul(mat_x, mat_y), mat_z);
 }
 
 struct Mat4x4 get_scale_matrix(const struct Vec4 *scale) {
@@ -178,16 +177,8 @@ struct Mat4x4 get_model_matrix(const struct Vec4 *rot,
 							   const struct Vec4 *trans, 
 							   const struct Vec4 *scale) {
 	struct Mat4x4 m_scale = get_scale_matrix(scale);
-	struct Mat4x4 m_rot = 
-		matrix_matrix_mul(
-			matrix_matrix_mul(
-				get_xrot_matrix(rot->x),
-				get_yrot_matrix(rot->y)
-			),
-			get_zrot_matrix(rot->z)
-		);
+	struct Mat4x4 m_rot = get_rot_matrix(rot);
 	struct Mat4x4 m_trans = get_trans_matrix(trans);
-
 	
 	return matrix_matrix_mul(matrix_matrix_mul(m_scale, m_rot), m_trans);
 }
