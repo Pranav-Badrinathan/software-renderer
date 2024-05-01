@@ -6,9 +6,9 @@ Reminicient of the early days of gaming, this program could theoretically be use
 
 ## Building and Running
 
-This program uses the SDL2 library to draw to the screen, handle windows, etc. To run the program, you'll need to download [SDL2 from its github page](https://github.com/libsdl-org/SDL/releases/) and place the `SDL2.dll` file (found in the `bin` folder inside the zip file) either on your OS's PATH, or adjacent to the compiled executable.
+This program uses the SDL2 library to draw to the screen, handle windows, etc. To run the program, you'll need to download [SDL2 from its github page](https://github.com/libsdl-org/SDL/releases/) and place the SDL2 binary file (found in the `bin` folder inside the zip file) either on your OS's PATH, or adjacent to the compiled executable.
 
-To build this library from source, create a folder called `lib` in the main folder, and extract the contents of the 64-bit version of SDL2 into the folder. It should look something like this:
+To supply your own SDL2 binary, create a folder called `lib` in the main folder, and extract the contents of the 64-bit version of SDL2 into the folder. It should look something like this:
 ```
 software-renderer
 |- lib
@@ -23,7 +23,9 @@ software-renderer
 |- Makefile
 ```
 
-Then, just run the make file with `make init`, which creates a new `bin` folder and copies the SDL.dll into it. Running `make` after should build and run the project.
+Then, just run the make file with `make init`, which creates a new `bin` folder and copies the SDL binary into it. Running `make` after should build and run the project.
+
+You only really use this sort of system on Windows or MacOS. On Linux, SDL2 is probably availaible to you via your distro's package manager. So ideally you would just use that as the shared runtime.
 
 ## To do
 - [x] Draw Lines.
@@ -33,7 +35,7 @@ Then, just run the make file with `make init`, which creates a new `bin` folder 
     - [x] View matrix.
     - [x] Perspective matrix.
     - [x] Perspective division (**N**ormalized **D**evice **C**oordinates).
-    - [ ] Hide backfaces. Use triangle face normals and camera direction vector to stop them rendering.
+    - [x] Hide backfaces. Use triangle face normals and camera direction vector to stop them rendering.
     - [ ] Convert to Clip Space.
         - [ ] Discard vertices outside screen bounds.
         - [ ] Re-triangulate broken triangles.
@@ -42,5 +44,6 @@ Then, just run the make file with `make init`, which creates a new `bin` folder 
 - [ ] An option to fill in faces. Shading?
 - [ ] Ray-tracing to figure out what object camera is looking at?
 - [ ] Simple UI to edit onscreen objects' transform properties.
-
+- [ ] Write tests (begin with linalg) and add Github Workflows.
+- [ ] Switch to using CMake as build system (removes mingw dependency for Windows, auto download SDL)
 - [ ] Quaternion rotations?
