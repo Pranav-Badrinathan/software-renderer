@@ -57,7 +57,7 @@ struct Vec4 vector_norm(struct Vec4 *v) {
 
 // MATRIX OPERATIONS 
 
-struct Vec4 matrix_vec3_mul(struct Mat4x4 *mat, struct Vec4 *v) {
+struct Vec4 matrix_vec_mul(struct Mat4x4 *mat, struct Vec4 *v) {
 	struct Vec4 point = {0};
 
 	point.x = v->x * mat->v[0][0] + v->y * mat->v[1][0] + v->z * mat->v[2][0] + v->w * mat->v[3][0];
@@ -183,7 +183,8 @@ struct Mat4x4 get_model_matrix(const struct Vec4 *rot,
 	return matrix_matrix_mul(matrix_matrix_mul(m_scale, m_rot), m_trans);
 }
 
-/* For a model matrix of form:, The view matrix is:
+/*
+* For a model matrix of form:, The view matrix is:
 *
 *  Model Matrix:		View Matrix:
 *  [ux vx wx tx]		[ux uy uz -dot(u,t)]

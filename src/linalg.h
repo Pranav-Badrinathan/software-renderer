@@ -52,7 +52,7 @@ struct Vec4 vector_cross(struct Vec4 *u, struct Vec4 *v);
 
 // Apply a matrix transformation to a vector.
 // returns: the transformed vector.
-struct Vec4 matrix_vec3_mul(struct Mat4x4 *mat, struct Vec4 *v);
+struct Vec4 matrix_vec_mul(struct Mat4x4 *mat, struct Vec4 *v);
 
 // Multiply two 4x4 matrices together.
 // returns: the resulting multiplied matrix.
@@ -67,6 +67,9 @@ struct Mat4x4 get_proj_matrix(const float near,
 							  const float far, 
 							  const float v_fov, 
 							  const float aspect_ratio);
+
+// Returns a Rotation matrix with the given rotation vector.
+struct Mat4x4 get_rot_matrix(const struct Vec4 *rot);
 
 // Return a model matrix based on given values.
 struct Mat4x4 get_model_matrix(const struct Vec4 *rot, 

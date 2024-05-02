@@ -11,7 +11,8 @@
 
 SDL_Window *window;
 struct Vec4 inp_rots = {0};
-struct Vec4 inp_trans = {0};
+struct Vec4 cam_trans = {0};
+struct Vec4 delta_trans = {0};
 
 void err_if_null(void *ptr, char *str) {
 	if (!ptr) {
@@ -21,12 +22,13 @@ void err_if_null(void *ptr, char *str) {
 }
 
 void cam_transform(void) {
-	if (key_held(SDL_SCANCODE_W)) inp_trans.z -= 0.0007;
-	if (key_held(SDL_SCANCODE_S)) inp_trans.z += 0.0007;
-	if (key_held(SDL_SCANCODE_A)) inp_trans.x -= 0.0007;
-	if (key_held(SDL_SCANCODE_D)) inp_trans.x += 0.0007;
-	if (key_held(SDL_SCANCODE_SPACE)) inp_trans.y -= 0.0007;
-	if (key_held(SDL_SCANCODE_LSHIFT)) inp_trans.y += 0.0007;
+	delta_trans = (struct Vec4) {0,0,0,0};
+	if (key_held(SDL_SCANCODE_W)) delta_trans.z -= 0.0007;
+	if (key_held(SDL_SCANCODE_S)) delta_trans.z += 0.0007;
+	if (key_held(SDL_SCANCODE_A)) delta_trans.x -= 0.0007;
+	if (key_held(SDL_SCANCODE_D)) delta_trans.x += 0.0007;
+	if (key_held(SDL_SCANCODE_SPACE)) delta_trans.y -= 0.0007;
+	if (key_held(SDL_SCANCODE_LSHIFT)) delta_trans.y += 0.0007;
 
 	if (key_held(SDL_SCANCODE_LEFT)) inp_rots.y += 0.0005;
 	if (key_held(SDL_SCANCODE_RIGHT)) inp_rots.y -= 0.0005;
@@ -64,8 +66,15 @@ void draw_cube(SDL_Surface *surface, long delta) {
 										   &(struct Vec4){0.0f, 0.0f, -3.0f},
 										   &(struct Vec4){1.0f, 1.0f,  1.0f});
 
+
+	// Transform the input absolute position to camera relative position.
+	struct Mat4x4 cam_rot = get_rot_matrix(&inp_rots);
+	struct Vec4 rel_trans = matrix_vec_mul(&cam_rot, &delta_trans);
+
+	cam_trans = vector_add(&cam_trans, &rel_trans);
+
 	struct Mat4x4 cam_m = get_model_matrix(&inp_rots,
-										   &inp_trans,
+										   &cam_trans,
 										   &(struct Vec4){1.0f, 1.0f, 1.0f});
 
 	struct Mat4x4 view = get_view_matrix(cam_m);
@@ -87,10 +96,10 @@ void draw_cube(SDL_Surface *surface, long delta) {
 			t.verts[j] = cube[i].verts[j];
 
 			// This can be done with a model matrix.
-			t.verts[j] = matrix_vec3_mul(&model_view, &t.verts[j]);
+			t.verts[j] = matrix_vec_mul(&model_view, &t.verts[j]);
 
 			// Projection matrix step.
-			t.verts[j] = matrix_vec3_mul(&proj, &t.verts[j]);
+			t.verts[j] = matrix_vec_mul(&proj, &t.verts[j]);
 			// Projection division step.
 			t.verts[j] = vector_div(&t.verts[j], t.verts[j].w);
 
