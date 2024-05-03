@@ -8,6 +8,7 @@
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
+#include <sys/time.h>
 
 SDL_Window *window;
 struct Vec4 inp_rots = {0};
@@ -162,7 +163,12 @@ void cleanup(void) {
 	SDL_Quit();
 }
 
+double delta_time = 0;
+
 int main(int argc, char *argv[]) {
+	struct timeval start;
+	struct timeval end;
+
 	// As name suggests, initialize SDL.
 	init_sdl();
 	init_gui(window);
@@ -170,13 +176,16 @@ int main(int argc, char *argv[]) {
 	atexit(cleanup);
 
 	// Main "game" loop.
-	long delta = 0;
 	while (1) {
+		gettimeofday(&start, NULL);
 		update_input();
 
-		draw_loop(delta);
+		draw_loop(delta_time);
 		draw_gui();
-		delta++;
+		gettimeofday(&end, NULL);
+		delta_time = ((((end.tv_sec - start.tv_sec) * 1000000) + end.tv_usec) - start.tv_usec) / 1000000.0;
+
+		/* printf("FPS: %f\n", 1/delta_time); */
 	}
 
 	return EXIT_SUCCESS;
