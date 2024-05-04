@@ -3,6 +3,7 @@
 #include "linalg.h"
 #include "draw.h"
 #include "input.h"
+#include "timing.h"
 #include <stdio.h>
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_surface.h>
@@ -166,27 +167,27 @@ void cleanup(void) {
 double delta_time = 0;
 
 int main(int argc, char *argv[]) {
-	struct timeval start;
-	struct timeval end;
-
 	// As name suggests, initialize SDL.
 	init_sdl();
 	init_gui(window);
 
 	atexit(cleanup);
+	struct Timer *delta = create_timer();
 
 	// Main "game" loop.
 	while (1) {
-		gettimeofday(&start, NULL);
+		start_timer(delta);
 		update_input();
+		/* sleep(1); */
 
 		draw_loop(delta_time);
 		draw_gui();
-		gettimeofday(&end, NULL);
-		delta_time = ((((end.tv_sec - start.tv_sec) * 1000000) + end.tv_usec) - start.tv_usec) / 1000000.0;
+		mark_timer(delta);
+		delta_time = (double)get_elapsed_time(delta) / 1e6;
 
-		/* printf("FPS: %f\n", 1/delta_time); */
+		printf("FPS: %f\n", 1/delta_time);
 	}
 
+	destroy_timer(delta);
 	return EXIT_SUCCESS;
 }
