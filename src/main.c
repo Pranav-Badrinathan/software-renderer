@@ -166,6 +166,9 @@ void cleanup(void) {
 
 double delta_time = 0;
 
+const int target_fps = 60;
+double ms_per_frame = (1.0 / target_fps) * 1000;
+
 int main(int argc, char *argv[]) {
 	// As name suggests, initialize SDL.
 	init_sdl();
@@ -178,13 +181,16 @@ int main(int argc, char *argv[]) {
 	while (1) {
 		start_timer(delta);
 		update_input();
-		/* sleep(1); */
 
 		draw_loop(delta_time);
 		draw_gui();
+
+		mark_timer(delta);
+		double d_draw = (double)get_elapsed_time(delta) / 1e3;
+		ms_sleep((ms_per_frame - d_draw));
+
 		mark_timer(delta);
 		delta_time = (double)get_elapsed_time(delta) / 1e6;
-
 		printf("FPS: %f\n", 1/delta_time);
 	}
 

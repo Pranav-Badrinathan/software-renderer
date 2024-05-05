@@ -1,6 +1,10 @@
 #include "timing.h"
 #include <stdlib.h>
 
+/*
+*   struct Timer implementation.
+*/
+
 // Get current time with microsecond resolution.
 uint64_t get_time_us(void) {
 #if defined(__unix__) || defined(__unix) || defined(__APPLE__)&&defined(__MACH__)
@@ -48,3 +52,20 @@ uint64_t get_elapsed_time(struct Timer *t) {
 	return (t->end - t->start);
 }
 
+/*
+*   Sleep.
+*/
+void ms_sleep(uint64_t ms_time) {
+#if defined(__unix__) || defined(__unix) || defined(__APPLE__)&&defined(__MACH__)
+
+	struct timespec ts;
+	ts.tv_sec = ms_time / 1000;
+	ts.tv_nsec = (ms_time % 1000) * 100000;
+	nanosleep(&ts, NULL);
+
+#elif defined(_WIN32)
+
+	Sleep(ms_time);
+
+#endif
+}

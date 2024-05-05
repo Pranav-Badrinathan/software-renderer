@@ -32,4 +32,10 @@ void mark_timer(struct Timer *t);
 // Make SURE to mark the timer at least once before calling this function!!!
 uint64_t get_elapsed_time(struct Timer *t);
 
+
+/*
+*   Sleep
+*/
+void ms_sleep(uint64_t ms_time);
+
 #endif
