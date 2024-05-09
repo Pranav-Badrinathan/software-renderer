@@ -16,6 +16,8 @@ struct Vec4 inp_rots = {0};
 struct Vec4 cam_trans = {0};
 struct Vec4 delta_trans = {0};
 
+struct Timer *delta;
+
 void err_if_null(void *ptr, char *str) {
 	if (!ptr) {
 		fprintf(stderr, "%s", str);
@@ -23,22 +25,22 @@ void err_if_null(void *ptr, char *str) {
 	}
 }
 
-void cam_transform(void) {
+void cam_transform(double delta) {
 	delta_trans = (struct Vec4) {0,0,0,0};
-	if (key_held(SDL_SCANCODE_W)) delta_trans.z -= 0.0007;
-	if (key_held(SDL_SCANCODE_S)) delta_trans.z += 0.0007;
-	if (key_held(SDL_SCANCODE_A)) delta_trans.x -= 0.0007;
-	if (key_held(SDL_SCANCODE_D)) delta_trans.x += 0.0007;
-	if (key_held(SDL_SCANCODE_SPACE)) delta_trans.y -= 0.0007;
-	if (key_held(SDL_SCANCODE_LSHIFT)) delta_trans.y += 0.0007;
+	if (key_held(SDL_SCANCODE_W)) delta_trans.z -= 3 * delta;
+	if (key_held(SDL_SCANCODE_S)) delta_trans.z += 3 * delta;
+	if (key_held(SDL_SCANCODE_A)) delta_trans.x -= 3 * delta;
+	if (key_held(SDL_SCANCODE_D)) delta_trans.x += 3 * delta;
+	if (key_held(SDL_SCANCODE_SPACE)) delta_trans.y -= 3 * delta;
+	if (key_held(SDL_SCANCODE_LSHIFT)) delta_trans.y += 3 * delta;
 
-	if (key_held(SDL_SCANCODE_LEFT)) inp_rots.y += 0.0005;
-	if (key_held(SDL_SCANCODE_RIGHT)) inp_rots.y -= 0.0005;
-	if (key_held(SDL_SCANCODE_UP)) inp_rots.x -= 0.0005;
-	if (key_held(SDL_SCANCODE_DOWN)) inp_rots.x += 0.0005;
+	if (key_held(SDL_SCANCODE_LEFT)) inp_rots.y += 3 * delta;
+	if (key_held(SDL_SCANCODE_RIGHT)) inp_rots.y -= 3 * delta;
+	if (key_held(SDL_SCANCODE_UP)) inp_rots.x -= 3 * delta;
+	if (key_held(SDL_SCANCODE_DOWN)) inp_rots.x += 3 * delta;
 }
 
-void draw_cube(SDL_Surface *surface, long delta) {
+void draw_cube(SDL_Surface *surface, double delta) {
 	struct Triangle cube[12] = {
 		(struct Triangle) {(struct Vec4){0, 0, 0, 1}, (struct Vec4){0, 1, 0, 1}, (struct Vec4){1, 1, 0, 1}},
 		(struct Triangle) {(struct Vec4){0, 0, 0, 1}, (struct Vec4){1, 1, 0, 1}, (struct Vec4){1, 0, 0, 1}},
@@ -59,7 +61,7 @@ void draw_cube(SDL_Surface *surface, long delta) {
 		(struct Triangle) {(struct Vec4){1, 0, 1, 1}, (struct Vec4){0, 0, 0, 1}, (struct Vec4){1, 0, 0, 1}},
 	};
 
-	cam_transform();
+	cam_transform(delta);
 
 	struct Mat4x4 proj = get_proj_matrix(0.1f, 1000.0f, M_PI/4, 
 									  (float)SCREEN_HEIGHT/(float)SCREEN_WIDTH);
@@ -143,7 +145,7 @@ void init_sdl(void) {
 	err_if_null(window, "Couldn't initialize SDL Window. Returned NULL!");
 }
 
-void draw_loop(long delta) {
+void draw_loop(double delta) {
 	err_if_null(window, "Couldn't initialize SDL Window. Returned NULL!");
 
 	SDL_Surface *surface = SDL_GetWindowSurface(window);
@@ -159,12 +161,13 @@ void draw_loop(long delta) {
 }
 
 void cleanup(void) {
+	destroy_timer(delta);
 	// Handle application closing
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 }
 
-double delta_time = 0;
+double delta_time = 1;
 
 const int target_fps = 60;
 double ms_per_frame = (1.0 / target_fps) * 1000;
@@ -175,7 +178,7 @@ int main(int argc, char *argv[]) {
 	init_gui(window);
 
 	atexit(cleanup);
-	struct Timer *delta = create_timer();
+	delta = create_timer();
 
 	// Main "game" loop.
 	while (1) {
@@ -191,9 +194,8 @@ int main(int argc, char *argv[]) {
 
 		mark_timer(delta);
 		delta_time = (double)get_elapsed_time(delta) / 1e6;
-		printf("FPS: %f\n", 1/delta_time);
+		/* printf("FPS: %f\n", 1/delta_time); */
 	}
 
-	destroy_timer(delta);
 	return EXIT_SUCCESS;
 }
